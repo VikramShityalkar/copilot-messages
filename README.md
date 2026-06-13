@@ -1,9 +1,5 @@
 # Copilot Conversation
 
-[![Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/VikramShityalkar.copilot-conversation.svg?color=indigo)](https://marketplace.visualstudio.com/items?itemName=VikramShityalkar.copilot-conversation)
-[![VS Code Version](https://img.shields.io/badge/vscode-%5E1.75.0-blue.svg)](https://code.visualstudio.com)
-[![Privacy Policy Badge](https://img.shields.io/badge/Privacy-100%25%20Local-success.svg)](https://github.com/VikramShityalkar/copilot-messages)
-
 **Copilot Conversation** is a centralized search, tagging, favorites, and analytics interface for your GitHub Copilot Chat history. Access, organize, search, and export your past conversations across all workspaces directly from your sidebar.
 
 ---
