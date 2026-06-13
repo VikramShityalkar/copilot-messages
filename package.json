@@ -3,7 +3,11 @@
   "displayName": "Copilot Conversation",
   "description": "Centralized search, tagging, favorites, and analytics for GitHub Copilot Chat history across all workspaces.",
   "version": "1.0.0",
-  "publisher": "Vikram Shityalkar",
+  "publisher": "VikramShityalkar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VikramShityalkar/copilot-messages"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
