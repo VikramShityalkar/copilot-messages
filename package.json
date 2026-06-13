@@ -1,0 +1,240 @@
+{
+  "name": "copilot-conversation",
+  "displayName": "Copilot Conversation",
+  "description": "Centralized search, tagging, favorites, and analytics for GitHub Copilot Chat history across all workspaces.",
+  "version": "1.0.0",
+  "publisher": "Vikram Shityalkar",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:copilotConversationRecent",
+    "onView:copilotConversationFavorites",
+    "onView:copilotConversationTags",
+    "onView:copilotConversationWorkspaces",
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "copilot-conversation-sidebar",
+          "title": "Copilot Conversation",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "copilot-conversation-sidebar": [
+        {
+          "id": "copilotConversationRecent",
+          "name": "Recent Conversations"
+        },
+        {
+          "id": "copilotConversationFavorites",
+          "name": "Favorites"
+        },
+        {
+          "id": "copilotConversationTags",
+          "name": "Tags"
+        },
+        {
+          "id": "copilotConversationWorkspaces",
+          "name": "Workspaces"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "copilotConversation.reindex",
+        "title": "Copilot Conversation: Reindex",
+        "category": "Copilot Conversation",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "copilotConversation.search",
+        "title": "Copilot Conversation: Search Conversations",
+        "category": "Copilot Conversation",
+        "icon": "$(search)"
+      },
+      {
+        "command": "copilotConversation.openFavorites",
+        "title": "Copilot Conversation: Open Favorites",
+        "category": "Copilot Conversation"
+      },
+      {
+        "command": "copilotConversation.export",
+        "title": "Copilot Conversation: Export Conversation",
+        "category": "Copilot Conversation"
+      },
+      {
+        "command": "copilotConversation.openWorkspace",
+        "title": "Open Workspace",
+        "category": "Copilot Conversation",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "copilotConversation.toggleFavorite",
+        "title": "Favorite / Unfavorite",
+        "category": "Copilot Conversation",
+        "icon": "$(star)"
+      },
+      {
+        "command": "copilotConversation.addTag",
+        "title": "Add Tag...",
+        "category": "Copilot Conversation",
+        "icon": "$(tag)"
+      },
+      {
+        "command": "copilotConversation.removeTag",
+        "title": "Remove Tag...",
+        "category": "Copilot Conversation",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "copilotConversation.exportMarkdown",
+        "title": "Export to Markdown...",
+        "category": "Copilot Conversation"
+      },
+      {
+        "command": "copilotConversation.exportJson",
+        "title": "Export to JSON...",
+        "category": "Copilot Conversation"
+      },
+      {
+        "command": "copilotConversation.exportSearchResults",
+        "title": "Export Search Results...",
+        "category": "Copilot Conversation"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "copilotConversation.reindex",
+          "when": "view == copilotConversationRecent || view == copilotConversationFavorites || view == copilotConversationTags || view == copilotConversationWorkspaces",
+          "group": "navigation"
+        },
+        {
+          "command": "copilotConversation.search",
+          "when": "view == copilotConversationRecent || view == copilotConversationFavorites || view == copilotConversationTags || view == copilotConversationWorkspaces",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "copilotConversation.toggleFavorite",
+          "when": "viewItem == conversation",
+          "group": "inline"
+        },
+        {
+          "command": "copilotConversation.openWorkspace",
+          "when": "viewItem == conversation",
+          "group": "inline"
+        },
+        {
+          "command": "copilotConversation.addTag",
+          "when": "viewItem == conversation",
+          "group": "1_modification"
+        },
+        {
+          "command": "copilotConversation.removeTag",
+          "when": "viewItem == conversation",
+          "group": "1_modification"
+        },
+        {
+          "command": "copilotConversation.openWorkspace",
+          "when": "viewItem == conversation",
+          "group": "2_navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Copilot Conversation",
+      "properties": {
+        "copilotConversation.enableAutoIndex": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically scan and index Copilot chat transcripts on startup."
+        },
+        "copilotConversation.storageLocation": {
+          "type": "string",
+          "default": "",
+          "description": "Custom path to VS Code's workspaceStorage folder. If blank, automatically detects based on OS."
+        },
+        "copilotConversation.maxResults": {
+          "type": "integer",
+          "default": 100,
+          "description": "Maximum number of search results to return."
+        },
+        "copilotConversation.watchChanges": {
+          "type": "boolean",
+          "default": true,
+          "description": "Watch for changes to chat session files and update index dynamically."
+        },
+        "copilotConversation.defaultTags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "architecture",
+            "database",
+            "performance",
+            "security",
+            "frontend"
+          ],
+          "description": "Default tag suggestions for Copilot conversations."
+        },
+        "copilotConversation.fileLinkExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "ts",
+            "js",
+            "json",
+            "css",
+            "html",
+            "yml",
+            "yaml",
+            "md",
+            "txt",
+            "py",
+            "sh",
+            "go",
+            "cpp",
+            "c",
+            "h",
+            "rs",
+            "java",
+            "cs",
+            "rb",
+            "php",
+            "swift",
+            "sql"
+          ],
+          "description": "File extensions that will be recognized and linkified in conversation messages."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/test_discovery.js"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "@types/vscode": "^1.75.0",
+    "@vscode/test-electron": "^2.3.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {}
+}

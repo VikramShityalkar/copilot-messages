@@ -1,0 +1,19 @@
+# Local dependencies
+node_modules/
+
+# Compiled typescript output
+out/
+
+# Packaged extension binaries
+*.vsix
+
+# VS Code test electron workspace storage folders
+.vscode-test/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Test execution artifacts & storage folders
+test-global-storage/
+out/test/fixtures/
