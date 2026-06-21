@@ -46,6 +46,15 @@ function setupFixtures() {
     // Create directories
     fs.mkdirSync(transcriptsDir, { recursive: true });
 
+    // Create mock memories folder
+    const memoriesRepoDir = path.join(mockWsDir, 'GitHub.copilot-chat', 'memory-tool', 'memories', 'repo');
+    fs.mkdirSync(memoriesRepoDir, { recursive: true });
+    fs.writeFileSync(
+        path.join(memoriesRepoDir, 'tech-stack.md'),
+        `Stack details\n- Node.js\n- TypeScript`,
+        'utf8'
+    );
+
     // Create workspace.json
     fs.writeFileSync(
         path.join(mockWsDir, 'workspace.json'),
@@ -107,6 +116,25 @@ async function runTest() {
         console.log(`  Resolved Path: ${resolved.workspacePath}`);
     } else {
         console.error(`  Test failed to resolve workspace details correctly. Got:`, resolved);
+        process.exit(1);
+    }
+
+    console.log('\n--- TEST 2b: Discover Memories ---');
+    const memories = await DiscoveryService.discoverMemories();
+    console.log(`Discovered ${memories.length} memory files.`);
+    const mockMemory = memories.find(m => m.fileName === 'tech-stack.md');
+    if (mockMemory) {
+        console.log(`  Found mock memory file:`);
+        console.log(`  - Scope: ${mockMemory.scope}`);
+        console.log(`  - Content: ${mockMemory.content.replace(/\r?\n/g, ' ')}`);
+        console.log(`  - Workspace Name: ${mockMemory.workspaceName}`);
+        console.log(`  - Workspace Path: ${mockMemory.workspacePath}`);
+        if (mockMemory.workspaceName !== 'mock-workspace-folder') {
+            console.error('Test failed: Mock memory workspace resolution mismatch.');
+            process.exit(1);
+        }
+    } else {
+        console.error('Test failed: Mock memory file "tech-stack.md" not discovered.');
         process.exit(1);
     }
 

@@ -12,6 +12,16 @@ export interface DiscoveredFile {
     mtime: number;
 }
 
+export interface DiscoveredMemory {
+    filePath: string;
+    fileName: string;
+    scope: 'user' | 'repo' | 'session';
+    workspacePath?: string;
+    workspaceName?: string;
+    content: string;
+    mtime: number;
+}
+
 export class DiscoveryService {
     /**
      * Detects standard workspaceStorage locations based on OS and settings.
@@ -218,5 +228,131 @@ export class DiscoveryService {
             messages,
             sourceFile: filePath
         };
+    }
+
+    /**
+     * Scans storage folders to find all Copilot memories.
+     */
+    public static async discoverMemories(): Promise<DiscoveredMemory[]> {
+        const storagePaths = this.getStoragePaths();
+        const discoveredMemories: DiscoveredMemory[] = [];
+
+        // 1. Scan global/user memories
+        const home = os.homedir();
+        const appData = process.env.APPDATA;
+        const globalMemoryPaths: string[] = [];
+
+        if (os.platform() === 'win32' && appData) {
+            globalMemoryPaths.push(path.join(appData, 'Code', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+            globalMemoryPaths.push(path.join(appData, 'Code - Insiders', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+            globalMemoryPaths.push(path.join(appData, 'VSCodium', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+        } else if (os.platform() === 'darwin') {
+            globalMemoryPaths.push(path.join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+            globalMemoryPaths.push(path.join(home, 'Library', 'Application Support', 'Code - Insiders', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+            globalMemoryPaths.push(path.join(home, 'Library', 'Application Support', 'VSCodium', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+        } else {
+            globalMemoryPaths.push(path.join(home, '.config', 'Code', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+            globalMemoryPaths.push(path.join(home, '.config', 'Code - Insiders', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+            globalMemoryPaths.push(path.join(home, '.config', 'VSCodium', 'User', 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories'));
+        }
+
+        // Also add relative to detected workspaceStorage paths as a fallback
+        for (const storagePath of storagePaths) {
+            const derivedGlobal = path.join(path.dirname(storagePath), 'globalStorage', 'github.copilot-chat', 'memory-tool', 'memories');
+            if (!globalMemoryPaths.includes(derivedGlobal)) {
+                globalMemoryPaths.push(derivedGlobal);
+            }
+        }
+
+        for (const globalPath of globalMemoryPaths) {
+            if (fs.existsSync(globalPath)) {
+                try {
+                    // Global memories can be directly in user/ folder under memories/
+                    const userScopePath = path.join(globalPath, 'user');
+                    if (fs.existsSync(userScopePath)) {
+                        const files = await fs.promises.readdir(userScopePath);
+                        for (const file of files) {
+                            if (file.endsWith('.md')) {
+                                const filePath = path.join(userScopePath, file);
+                                try {
+                                    const stat = await fs.promises.stat(filePath);
+                                    const content = await fs.promises.readFile(filePath, 'utf8');
+                                    discoveredMemories.push({
+                                        filePath,
+                                        fileName: file,
+                                        scope: 'user',
+                                        content,
+                                        mtime: stat.mtimeMs
+                                    });
+                                } catch (e) {
+                                    // Skip unreadable files
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error reading global memory path ${globalPath}:`, error);
+                }
+            }
+        }
+
+        // 2. Scan workspace-specific memories
+        for (const storagePath of storagePaths) {
+            try {
+                const subdirs = await fs.promises.readdir(storagePath);
+                for (const subdir of subdirs) {
+                    const workspaceStoragePath = path.join(storagePath, subdir);
+                    const copilotMemoriesPath = path.join(
+                        workspaceStoragePath,
+                        'GitHub.copilot-chat',
+                        'memory-tool',
+                        'memories'
+                    );
+
+                    if (fs.existsSync(copilotMemoriesPath)) {
+                        // Scan repo/ and session/ subfolders
+                        const scopes: ('repo' | 'session')[] = ['repo', 'session'];
+                        for (const scope of scopes) {
+                            const scopePath = path.join(copilotMemoriesPath, scope);
+                            if (fs.existsSync(scopePath)) {
+                                try {
+                                    const files = await fs.promises.readdir(scopePath);
+                                    
+                                    // Resolve workspace details once per workspace storage subdir
+                                    let resolvedWorkspace = await WorkspaceResolver.resolve(workspaceStoragePath);
+
+                                    for (const file of files) {
+                                        if (file.endsWith('.md')) {
+                                            const filePath = path.join(scopePath, file);
+                                            try {
+                                                const stat = await fs.promises.stat(filePath);
+                                                const content = await fs.promises.readFile(filePath, 'utf8');
+                                                discoveredMemories.push({
+                                                    filePath,
+                                                    fileName: file,
+                                                    scope,
+                                                    workspacePath: resolvedWorkspace?.workspacePath,
+                                                    workspaceName: resolvedWorkspace?.workspaceName,
+                                                    content,
+                                                    mtime: stat.mtimeMs
+                                                });
+                                            } catch (e) {
+                                                // Skip
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    // Skip
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(`Error scanning workspace memories in storage path ${storagePath}:`, error);
+            }
+        }
+
+        return discoveredMemories;
     }
 }

@@ -3,6 +3,7 @@ import { Database } from './storage/Database';
 import { IndexService } from './services/IndexService';
 import { SearchService } from './services/SearchService';
 import { CopilotMessagesTreeProvider } from './providers/TreeDataProvider';
+import { CopilotMemoriesTreeProvider } from './providers/MemoriesTreeDataProvider';
 import { SearchCommand } from './commands/SearchCommand';
 import { ConversationPanel } from './views/ConversationPanel';
 import { WorkspaceCommands } from './commands/WorkspaceCommands';
@@ -36,12 +37,14 @@ export async function activate(context: vscode.ExtensionContext) {
     const favoritesProvider = new CopilotMessagesTreeProvider(searchService, indexService, 'favorites');
     const tagsProvider = new CopilotMessagesTreeProvider(searchService, indexService, 'tags');
     const workspacesProvider = new CopilotMessagesTreeProvider(searchService, indexService, 'workspaces');
+    const memoriesProvider = new CopilotMemoriesTreeProvider(indexService);
 
     context.subscriptions.push(
         vscode.window.registerTreeDataProvider('copilotConversationRecent', recentProvider),
         vscode.window.registerTreeDataProvider('copilotConversationFavorites', favoritesProvider),
         vscode.window.registerTreeDataProvider('copilotConversationTags', tagsProvider),
-        vscode.window.registerTreeDataProvider('copilotConversationWorkspaces', workspacesProvider)
+        vscode.window.registerTreeDataProvider('copilotConversationWorkspaces', workspacesProvider),
+        vscode.window.registerTreeDataProvider('copilotConversationMemories', memoriesProvider)
     );
 
     const refreshViews = () => {
@@ -49,6 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
         favoritesProvider.refresh();
         tagsProvider.refresh();
         workspacesProvider.refresh();
+        memoriesProvider.refresh();
     };
 
     // Register Workspace commands (Open Workspace, Favorite, Tagging, Exports)

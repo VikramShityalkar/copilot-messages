@@ -2,7 +2,7 @@
   "name": "copilot-conversation",
   "displayName": "Copilot Conversation",
   "description": "Centralized search, tagging, favorites, and analytics for GitHub Copilot Chat history across all workspaces.",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "publisher": "VikramShityalkar",
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "onView:copilotConversationFavorites",
     "onView:copilotConversationTags",
     "onView:copilotConversationWorkspaces",
+    "onView:copilotConversationMemories",
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
@@ -51,6 +52,10 @@
         {
           "id": "copilotConversationWorkspaces",
           "name": "Workspaces"
+        },
+        {
+          "id": "copilotConversationMemories",
+          "name": "Copilot Memories"
         }
       ]
     },
@@ -121,12 +126,12 @@
       "view/title": [
         {
           "command": "copilotConversation.reindex",
-          "when": "view == copilotConversationRecent || view == copilotConversationFavorites || view == copilotConversationTags || view == copilotConversationWorkspaces",
+          "when": "view == copilotConversationRecent || view == copilotConversationFavorites || view == copilotConversationTags || view == copilotConversationWorkspaces || view == copilotConversationMemories",
           "group": "navigation"
         },
         {
           "command": "copilotConversation.search",
-          "when": "view == copilotConversationRecent || view == copilotConversationFavorites || view == copilotConversationTags || view == copilotConversationWorkspaces",
+          "when": "view == copilotConversationRecent || view == copilotConversationFavorites || view == copilotConversationTags || view == copilotConversationWorkspaces || view == copilotConversationMemories",
           "group": "navigation"
         }
       ],
