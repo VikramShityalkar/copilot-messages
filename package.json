@@ -2,7 +2,7 @@
   "name": "copilot-conversation",
   "displayName": "Copilot Conversation",
   "description": "Centralized search, tagging, favorites, and analytics for GitHub Copilot Chat history across all workspaces.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "VikramShityalkar",
   "repository": {
     "type": "git",

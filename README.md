@@ -1,6 +1,15 @@
 # Copilot Conversation
 
-**Copilot Conversation** is a centralized search, tagging, favorites, and analytics interface for your GitHub Copilot Chat history. Access, organize, search, and export your past conversations across all workspaces directly from your sidebar.
+GitHub Copilot Chat is an incredible companion for writing code, but developers frequently face several frustrations:
+* **Lost Context**: Conversations are stored deep in system directories, making it difficult to revisit a brilliant solution from last week.
+* **No Global Search**: You can't search across all your past conversations or locate code snippets from multiple projects simultaneously.
+* **Lack of Organization**: There is no way to bookmark, categorize, or tag conversations for future reference.
+* **Hidden Memories**: The facts and preferences that Copilot learns and captures about your projects (User and Repository memories) are hidden away in internal folders, offering no easy way to inspect or edit them.
+
+**Copilot Conversation** solves these problems by providing a 100% local, centralized search, tagging, favorites, and analytics interface for your GitHub Copilot Chat history. Access, organize, search, and export your past conversations—and manage your captured Copilot Memories—directly from your sidebar.
+
+> [!TIP]
+> **Have feedback or new feature requirements?** Please report issues and requirements on our [GitHub Issues page](https://github.com/VikramShityalkar/copilot-messages/issues)!
 
 ---
 
@@ -33,6 +42,7 @@ After installation, click the **Copilot Conversation** icon on your VS Code Acti
 2. **Favorites**: Your starred conversations.
 3. **Tags**: Conversations grouped by their tags.
 4. **Workspaces**: Conversations grouped by the workspace where they were initiated.
+5. **Copilot Memories**: Structured view of local preferences and facts captured by Copilot's memory tool, grouped by scope (Global and Workspace). Clicking any item opens the memory markdown file directly for viewing or editing.
 
 ### Commands
 Open the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and type:
